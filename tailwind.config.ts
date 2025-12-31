@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import tailwindAnimate from "tailwindcss-animate";
 
 export default {
   darkMode: ["class"],
@@ -57,6 +58,14 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        gold: "hsl(var(--gold))",
+        emerald: "hsl(var(--emerald))",
+        ruby: "hsl(var(--ruby))",
+        diamond: "hsl(var(--diamond))",
+      },
+      fontFamily: {
+        display: ["Space Grotesk", "system-ui", "sans-serif"],
+        body: ["Inter", "system-ui", "sans-serif"],
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -65,27 +74,34 @@ export default {
       },
       keyframes: {
         "accordion-down": {
-          from: {
-            height: "0",
-          },
-          to: {
-            height: "var(--radix-accordion-content-height)",
-          },
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
-          from: {
-            height: "var(--radix-accordion-content-height)",
-          },
-          to: {
-            height: "0",
-          },
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
+        },
+        "float": {
+          "0%, 100%": { transform: "translateY(0px)" },
+          "50%": { transform: "translateY(-10px)" },
+        },
+        "shimmer": {
+          "0%": { backgroundPosition: "-200% 0" },
+          "100%": { backgroundPosition: "200% 0" },
+        },
+        "card-flip": {
+          "0%": { transform: "rotateY(0deg)" },
+          "100%": { transform: "rotateY(180deg)" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "float": "float 3s ease-in-out infinite",
+        "shimmer": "shimmer 2s linear infinite",
+        "card-flip": "card-flip 0.6s ease-in-out",
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [tailwindAnimate],
 } satisfies Config;
