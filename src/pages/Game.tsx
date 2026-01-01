@@ -4,7 +4,7 @@ import { useGameStore } from '@/stores/gameStore';
 import { GameLobby } from '@/components/game/GameLobby';
 import { PokerTable } from '@/components/game/PokerTable';
 import { createTexasHoldemGame, startTexasHoldem, processTexasHoldemAction } from '@/lib/game/texasHoldem';
-import { GameType, TexasHoldemState } from '@/types/game';
+import { GameType, TexasHoldemState, GamePlayer } from '@/types/game';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Copy, LogOut, Share2 } from 'lucide-react';
@@ -67,13 +67,23 @@ const Game = () => {
   useEffect(() => {
     // Auto-join if game ID in URL or from iMessage
     const gameId = gameIdFromUrl || window.iMessageGameId;
-    if (gameId && isInLobby) {
-      const playerName = prompt('Enter your name to join the game:');
+    if (gameId && !currentGame) {
+      // Auto-generate player name for iMessage, or prompt for web
+      let playerName: string | null;
+
+      if (window.isIMessage) {
+        // Auto-generate name for iMessage users
+        playerName = `Player ${Math.floor(Math.random() * 1000)}`;
+      } else {
+        // Prompt for web users
+        playerName = prompt('Enter your name to join the game:');
+      }
+
       if (playerName) {
         handleJoinGame(gameId, playerName);
       }
     }
-  }, [gameIdFromUrl]);
+  }, [gameIdFromUrl, currentGame]);
 
   useEffect(() => {
     // Set game as started if status is active
@@ -123,13 +133,46 @@ const Game = () => {
     try {
       const playerId = `player-${Date.now()}-${Math.random().toString(36).substring(7)}`;
       setCurrentPlayer(playerId);
-      
+
+      // First, join/load the game
       await joinGame(gameId);
+
+      // Wait a moment for game to load
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      // Get the current game state
+      const game = useGameStore.getState().currentGame;
+      if (!game) {
+        throw new Error('Game not found');
+      }
+
+      // Check if player already exists
+      const existingPlayer = game.players.find(p => p.id === playerId);
+      if (!existingPlayer) {
+        // Add player to the game with required GamePlayer properties
+        const newPlayer: GamePlayer = {
+          id: playerId,
+          name: playerName,
+          isHost: false,
+          joinedAt: Date.now(),
+          hand: [],
+          status: 'active',
+          position: game.players.length,
+          chips: game.type === 'texas-holdem' ? 1000 : undefined,
+          bet: game.type === 'texas-holdem' ? 0 : undefined,
+        };
+
+        await updateGame({
+          players: [...game.players, newPlayer],
+        });
+      }
+
       setIsInLobby(false);
-      toast.success('Joined game!');
+      toast.success(`Joined game as ${playerName}!`);
     } catch (error) {
       console.error('Error joining game:', error);
-      toast.error('Failed to join game');
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      toast.error(`Failed to join game: ${errorMessage}`);
     }
   };
 
