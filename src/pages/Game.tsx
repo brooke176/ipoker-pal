@@ -40,7 +40,9 @@ const Game = () => {
     updateGame,
   } = useGameStore();
 
-  const [isInLobby, setIsInLobby] = useState(true);
+  // If there's a gameId in URL, skip the lobby
+  const gameIdToJoin = gameIdFromUrl || window.iMessageGameId;
+  const [isInLobby, setIsInLobby] = useState(!gameIdToJoin);
   const [gameStarted, setGameStarted] = useState(false);
   const [isIMessage, setIsIMessage] = useState(false);
 
