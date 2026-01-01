@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(test:*)",
+      "Bash(cat:*)",
+      "Bash(wc:*)",
+      "Bash(npm run build:*)",
+      "Bash(xcodebuild:*)",
+      "Bash(brew install:*)",
+      "Bash(xcrun simctl:*)",
+      "Bash(xcodegen generate:*)",
+      "Bash(ls:*)",
+      "Bash(lsof:*)",
+      "Bash(APP_PATH=\"/Users/brookeskinner/Library/Developer/Xcode/DerivedData/Decker-bxvcabgmaalyhtgejnaqxaywycer/Build/Products/Debug-iphonesimulator/Decker.app\":*)",
+      "Bash(plutil:*)",
+      "Bash(python3:*)",
+      "Bash(npm install:*)",
+      "Bash(vercel:*)",
+      "Bash(npx vercel deploy --prod --yes)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push)"
+    ]
+  }
+}

@@ -2,9 +2,12 @@ import { motion } from "framer-motion";
 import { Button } from "./ui/button";
 import { CardSuit } from "./CardSuit";
 import { MessageCircle, Sparkles } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import heroImage from "@/assets/hero-cards.jpg";
 
 export const HeroSection = () => {
+  const navigate = useNavigate();
+  
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-hero-gradient">
       {/* Background image with overlay */}
@@ -89,12 +92,12 @@ export const HeroSection = () => {
             transition={{ delay: 0.4 }}
             className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4"
           >
-            <Button variant="gold" size="xl" className="gap-3">
+            <Button variant="gold" size="xl" className="gap-3" onClick={() => navigate('/game')}>
               <Sparkles size={20} />
-              Get DeckDuel
+              Play Now
             </Button>
-            <Button variant="glass" size="xl">
-              View Games
+            <Button variant="glass" size="xl" onClick={() => navigate('/game')}>
+              Join Game
             </Button>
           </motion.div>
 
