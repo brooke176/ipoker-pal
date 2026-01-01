@@ -3,8 +3,8 @@ import { useSearchParams } from 'react-router-dom';
 import { useGameStore } from '@/stores/gameStore';
 import { GameLobby } from '@/components/game/GameLobby';
 import { PokerTable } from '@/components/game/PokerTable';
-import { createTexasHoldemGame, startTexasHoldem } from '@/lib/game/texasHoldem';
-import { GameType, TexasHoldemState, Player } from '@/types/game';
+import { createTexasHoldemGame, startTexasHoldem, processTexasHoldemAction } from '@/lib/game/texasHoldem';
+import { GameType, TexasHoldemState } from '@/types/game';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Copy, LogOut, Share2 } from 'lucide-react';
@@ -108,20 +108,14 @@ const Game = () => {
 
         // Copy game ID to clipboard for sharing
         const gameUrl = `${window.location.origin}${window.location.pathname}?gameId=${gameId}`;
-        try {
-          await navigator.clipboard.writeText(gameUrl);
-          toast.success('Game created! Link copied to clipboard.');
-        } catch (clipboardError) {
-          console.warn('Failed to copy to clipboard:', clipboardError);
-          toast.success(`Game created! Game ID: ${gameId}`);
-        }
+        await navigator.clipboard.writeText(gameUrl);
+        toast.success('Game created! Link copied to clipboard.');
       } else {
         toast.error('This game type is not yet implemented.');
       }
     } catch (error) {
       console.error('Error creating game:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-      toast.error(`Failed to create game: ${errorMessage}`);
+      toast.error('Failed to create game');
     }
   };
 
@@ -129,43 +123,13 @@ const Game = () => {
     try {
       const playerId = `player-${Date.now()}-${Math.random().toString(36).substring(7)}`;
       setCurrentPlayer(playerId);
-
-      // First, subscribe to the game
+      
       await joinGame(gameId);
-
-      // Wait a bit for the game state to load
-      await new Promise(resolve => setTimeout(resolve, 500));
-
-      // Get the current game from store
-      const game = useGameStore.getState().currentGame;
-
-      if (!game) {
-        throw new Error('Game not found');
-      }
-
-      // Check if player is already in the game
-      const existingPlayer = game.players.find(p => p.id === playerId);
-
-      if (!existingPlayer) {
-        // Add the new player to the game
-        const newPlayer: Player = {
-          id: playerId,
-          name: playerName,
-          isHost: false,
-          joinedAt: Date.now(),
-        };
-
-        await updateGame({
-          players: [...game.players, newPlayer],
-        });
-      }
-
       setIsInLobby(false);
       toast.success('Joined game!');
     } catch (error) {
       console.error('Error joining game:', error);
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-      toast.error(`Failed to join game: ${errorMessage}`);
+      toast.error('Failed to join game');
     }
   };
 
@@ -185,7 +149,7 @@ const Game = () => {
     }
   };
 
-  const handleAction = async (action: { type: 'fold' | 'check' | 'call' | 'raise' | 'all-in'; amount?: number }) => {
+  const handleAction = async (action: { type: string; amount?: number }) => {
     if (!currentGame || !currentPlayerId) {
       return;
     }

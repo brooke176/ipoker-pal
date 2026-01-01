@@ -1,15 +1,11 @@
-import { HeroSection } from "@/components/HeroSection";
 import { GamesSection } from "@/components/GamesSection";
-import { HowItWorks } from "@/components/HowItWorks";
 import { Footer } from "@/components/Footer";
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
-      <HeroSection />
       <GamesSection />
-      <HowItWorks />
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 };
